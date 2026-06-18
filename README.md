@@ -104,7 +104,7 @@ A RAG-based chatbot that answers questions about Mahatma Gandhi's writings by se
 
 \# Clone the repository
 
-git clone https://github.com/YOUR\_USERNAME/gandhi-knowledge-assistant.git
+git clone https://github.com/kanetiyahet/Knowledge-Assistant.git
 
 cd gandhi-knowledge-assistant
 
