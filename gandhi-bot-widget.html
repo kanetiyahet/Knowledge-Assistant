@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gandhi Bot Widget</title>
+<style>
+/* ============ FLOATING BUTTON ============ */
+.gandhi-bot-btn {
+    position: fixed !important;
+    bottom: 25px !important;
+    right: 25px !important;
+    width: 60px !important;
+    height: 60px !important;
+    background: #27ae60 !important;
+    border: none !important;
+    border-radius: 50% !important;
+    font-size: 28px !important;
+    cursor: pointer !important;
+    z-index: 2147483647 !important;
+    box-shadow: 0 4px 20px rgba(39,174,96,0.5) !important;
+    transition: 0.3s !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+}
+.gandhi-bot-btn:hover { transform: scale(1.1) !important; background: #219a52 !important; }
+
+/* ============ BADGE ============ */
+.gandhi-bot-badge {
+    position: fixed !important;
+    bottom: 75px !important;
+    right: 30px !important;
+    background: #e74c3c !important;
+    color: white !important;
+    width: 22px !important;
+    height: 22px !important;
+    border-radius: 50% !important;
+    font-size: 12px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    z-index: 2147483647 !important;
+    font-family: Arial !important;
+    font-weight: bold !important;
+}
+
+/* ============ CHAT WINDOW ============ */
+.gandhi-bot-window {
+    position: fixed !important;
+    bottom: 100px !important;
+    right: 25px !important;
+    width: 370px !important;
+    height: 520px !important;
+    background: white !important;
+    border-radius: 15px !important;
+    box-shadow: 0 10px 50px rgba(0,0,0,0.3) !important;
+    display: none !important;
+    flex-direction: column !important;
+    z-index: 2147483646 !important;
+    font-family: 'Segoe UI', Arial, sans-serif !important;
+    overflow: hidden !important;
+    border: 1px solid #ddd !important;
+}
+.gandhi-bot-window.open { display: flex !important; }
+
+/* ============ HEADER ============ */
+.gandhi-bot-header {
+    background: linear-gradient(135deg, #2c3e50, #8b4513) !important;
+    color: white !important;
+    padding: 14px 16px !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 10px !important;
+}
+.gandhi-bot-header .avatar {
+    font-size: 28px !important;
+}
+.gandhi-bot-header h4 { margin: 0 !important; font-size: 14px !important; }
+.gandhi-bot-header small { font-size: 10px !important; opacity: 0.8 !important; }
+.gandhi-bot-close {
+    margin-left: auto !important;
+    background: none !important;
+    border: none !important;
+    color: white !important;
+    font-size: 22px !important;
+    cursor: pointer !important;
+    padding: 5px 10px !important;
+}
+
+/* ============ MESSAGES ============ */
+.gandhi-bot-messages {
+    flex: 1 !important;
+    overflow-y: auto !important;
+    padding: 15px !important;
+    background: #f9f7f2 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 10px !important;
+}
+.gandhi-bot-msg {
+    max-width: 85% !important;
+    padding: 10px 14px !important;
+    border-radius: 15px !important;
+    font-size: 13px !important;
+    line-height: 1.5 !important;
+    word-wrap: break-word !important;
+}
+.gandhi-bot-msg.bot {
+    background: white !important;
+    border: 1px solid #e0d5c0 !important;
+    align-self: flex-start !important;
+    border-bottom-left-radius: 5px !important;
+}
+.gandhi-bot-msg.user {
+    background: #27ae60 !important;
+    color: white !important;
+    align-self: flex-end !important;
+    border-bottom-right-radius: 5px !important;
+}
+.gandhi-bot-msg .src {
+    margin-top: 8px !important;
+    padding-top: 6px !important;
+    border-top: 1px solid #ddd !important;
+    font-size: 10px !important;
+    color: #888 !important;
+}
+
+/* ============ TYPING ============ */
+.gandhi-bot-typing {
+    display: flex !important;
+    gap: 4px !important;
+    padding: 10px 14px !important;
+}
+.gandhi-bot-typing span {
+    width: 7px !important;
+    height: 7px !important;
+    background: #bbb !important;
+    border-radius: 50% !important;
+    animation: gandhi-bounce 1.4s infinite !important;
+}
+.gandhi-bot-typing span:nth-child(2) { animation-delay: 0.2s !important; }
+.gandhi-bot-typing span:nth-child(3) { animation-delay: 0.4s !important; }
+@keyframes gandhi-bounce {
+    0%, 60%, 100% { transform: translateY(0) !important; }
+    30% { transform: translateY(-8px) !important; }
+}
+
+/* ============ INPUT ============ */
+.gandhi-bot-input {
+    padding: 12px !important;
+    border-top: 1px solid #eee !important;
+    display: flex !important;
+    gap: 8px !important;
+    background: white !important;
+}
+.gandhi-bot-input input {
+    flex: 1 !important;
+    padding: 10px 14px !important;
+    border: 2px solid #e0d5c0 !important;
+    border-radius: 20px !important;
+    outline: none !important;
+    font-size: 13px !important;
+}
+.gandhi-bot-input input:focus { border-color: #27ae60 !important; }
+.gandhi-bot-input button {
+    padding: 10px 18px !important;
+    background: #27ae60 !important;
+    color: white !important;
+    border: none !important;
+    border-radius: 20px !important;
+    cursor: pointer !important;
+    font-weight: bold !important;
+}
+
+/* ============ SUGGESTIONS ============ */
+.gandhi-bot-suggestions {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    gap: 6px !important;
+    padding: 10px 15px !important;
+}
+.gandhi-bot-suggestions button {
+    padding: 6px 12px !important;
+    background: #f0e6d3 !important;
+    border: 1px solid #d4c5a0 !important;
+    border-radius: 15px !important;
+    cursor: pointer !important;
+    font-size: 11px !important;
+    color: #5c3d0e !important;
+}
+.gandhi-bot-suggestions button:hover { background: #e0d5b8 !important; }
+
+/* ============ MOBILE ============ */
+@media (max-width: 450px) {
+    .gandhi-bot-window {
+        width: 100% !important;
+        height: 100% !important;
+        bottom: 0 !important;
+        right: 0 !important;
+        border-radius: 0 !important;
+    }
+    .gandhi-bot-btn { bottom: 15px !important; right: 15px !important; }
+}
+
+/* ============ BRANDING ============ */
+.gandhi-bot-branding {
+    text-align: center !important;
+    padding: 8px !important;
+    font-size: 9px !important;
+    color: #bbb !important;
+    background: #f9f9f9 !important;
+}
+</style>
+</head>
+<body>
+
+<!-- FLOATING BUTTON -->
+<button class="gandhi-bot-btn" id="gandhiBotBtn" onclick="gandhiBot.toggle()">🕊️</button>
+<div class="gandhi-bot-badge" id="gandhiBadge">1</div>
+
+<!-- CHAT WINDOW -->
+<div class="gandhi-bot-window" id="gandhiBotWindow">
+    <div class="gandhi-bot-header">
+        <span class="avatar">🕊️</span>
+        <div>
+            <h4> Knowledge Bot</h4>
+        </div>
+        <button class="gandhi-bot-close" onclick="gandhiBot.close()">✕</button>
+    </div>
+    
+    <div class="gandhi-bot-messages" id="gandhiMessages">
+        <div class="gandhi-bot-msg bot">
+            🙏 <b>Namaste!</b> I answer questions from Gandhi's writings — <b>not the internet</b>.
+        </div>
+        <div class="gandhi-bot-suggestions" id="gandhiSuggestions">
+            <button onclick="gandhiBot.ask('What is Satyagraha?')">What is Satyagraha?</button>
+            <button onclick="gandhiBot.ask('What did Gandhi say about education?')">Gandhi on education</button>
+            <button onclick="gandhiBot.ask('Where did Dandi March start?')">Dandi March</button>
+            <button onclick="gandhiBot.ask('What is Ahimsa?')">What is Ahimsa?</button>
+        </div>
+    </div>
+    
+    <div class="gandhi-bot-input">
+        <input type="text" id="gandhiInput" placeholder="Ask about Gandhi..." onkeypress="if(event.key==='Enter')gandhiBot.send()">
+        <button onclick="gandhiBot.send()">➤</button>
+    </div>
+    
+    <div class="gandhi-bot-branding">
+        Powered by AI • Uses library data only
+    </div>
+</div>
+
+<script>
+// ============ GANDHI BOT WIDGET ============
+const gandhiBot = {
+    // ⚙️ CONFIG - Change this to your backend URL
+    apiUrl: 'http://localhost:8000/ask',
+    
+    isOpen: false,
+    
+    toggle: function() {
+        const win = document.getElementById('gandhiBotWindow');
+        const badge = document.getElementById('gandhiBadge');
+        this.isOpen = !this.isOpen;
+        
+        if (this.isOpen) {
+            win.classList.add('open');
+            badge.style.display = 'none';
+            document.getElementById('gandhiInput').focus();
+        } else {
+            win.classList.remove('open');
+        }
+    },
+    
+    close: function() {
+        document.getElementById('gandhiBotWindow').classList.remove('open');
+        this.isOpen = false;
+    },
+    
+    ask: function(question) {
+        document.getElementById('gandhiInput').value = question;
+        this.send();
+    },
+    
+    send: async function() {
+        const input = document.getElementById('gandhiInput');
+        const question = input.value.trim();
+        if (!question) return;
+        
+        const messages = document.getElementById('gandhiMessages');
+        const suggestions = document.getElementById('gandhiSuggestions');
+        
+        // Hide suggestions
+        if (suggestions) suggestions.style.display = 'none';
+        
+        // Add user message
+        messages.innerHTML += `<div class="gandhi-bot-msg user">${this.escapeHtml(question)}</div>`;
+        
+        // Typing indicator
+        const typingId = 'typing' + Date.now();
+        messages.innerHTML += `
+            <div class="gandhi-bot-msg bot" id="${typingId}">
+                <div class="gandhi-bot-typing">
+                    <span></span><span></span><span></span>
+                </div>
+            </div>
+        `;
+        
+        input.value = '';
+        messages.scrollTop = messages.scrollHeight;
+        
+        try {
+            const res = await fetch(this.apiUrl, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ question })
+            });
+            
+            const data = await res.json();
+            
+            // Remove typing
+            document.getElementById(typingId)?.remove();
+            
+            // Build sources
+            let srcHtml = '';
+            if (data.sources && data.sources.length > 0) {
+                srcHtml = '<div class="src">📚 ';
+                data.sources.forEach(s => {
+                    srcHtml += `📖 ${s.book} (Pg ${s.page}) | `;
+                });
+                srcHtml += '</div>';
+            }
+            
+            // Add bot message
+            messages.innerHTML += `
+                <div class="gandhi-bot-msg bot">
+                    ${this.escapeHtml(data.answer)}
+                    ${srcHtml}
+                </div>
+            `;
+            
+        } catch (err) {
+            document.getElementById(typingId)?.remove();
+            messages.innerHTML += `
+                <div class="gandhi-bot-msg bot">
+                    ❌ Server not reachable.<br>
+                    <small>Start backend: uvicorn main:app --host 0.0.0.0 --port 8000</small>
+                </div>
+            `;
+        }
+        
+        messages.scrollTop = messages.scrollHeight;
+        input.focus();
+    },
+    
+    escapeHtml: function(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+};
+
+// Hide badge after 10 seconds
+setTimeout(() => {
+    document.getElementById('gandhiBadge').style.display = 'none';
+}, 10000);
+</script>
+
+</body>
+</html>

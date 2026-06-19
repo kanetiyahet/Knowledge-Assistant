@@ -1,14 +1,16 @@
 import os
-import fitz  # PyMuPDF
+import fitz
 from qdrant_client import QdrantClient
 from qdrant_client.models import Distance, VectorParams, PointStruct
 from sentence_transformers import SentenceTransformer
 
 # ===== CONFIGURATION =====
 BOOKS_FOLDER = "books"
-MODEL_NAME = "all-MiniLM-L6-v2"         # or "all-MiniLM-L6-v2" for speed
+MODEL_NAME = "paraphrase-multilingual-MiniLM-L12-v2"  # ← CHANGE THIS
 QDRANT_PATH = "qdrant_db"
 COLLECTION_NAME = "gandhi_library"
+
+
 
 # ===== LOAD ALL PDFS =====
 pdf_files = [f for f in os.listdir(BOOKS_FOLDER) if f.lower().endswith(".pdf")]
