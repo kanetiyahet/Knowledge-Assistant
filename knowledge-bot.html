@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Knowledge Bot</title>
 <style>
-.gandhi-bot-btn {
+.Book-bot-btn {
     position: fixed; bottom: 25px; right: 25px;
     width: 60px; height: 60px; background: #27ae60;
     border: none; border-radius: 50%; font-size: 28px;
@@ -13,70 +13,70 @@
     box-shadow: 0 4px 20px rgba(39,174,96,0.5);
     display: flex; align-items: center; justify-content: center;
 }
-.gandhi-bot-btn:hover { transform: scale(1.1); }
-.gandhi-bot-window {
+.Book-bot-btn:hover { transform: scale(1.1); }
+.Book-bot-window {
     position: fixed; bottom: 100px; right: 25px;
     width: 370px; height: 550px; background: white;
     border-radius: 15px; box-shadow: 0 10px 50px rgba(0,0,0,0.3);
     display: none; flex-direction: column; z-index: 2147483646;
     font-family: Arial, sans-serif; overflow: hidden;
 }
-.gandhi-bot-window.open { display: flex; }
-.gandhi-bot-header {
+.Book-bot-window.open { display: flex; }
+.Book-bot-header {
     background: linear-gradient(135deg, #2c3e50, #8b4513);
     color: white; padding: 12px 14px;
     display: flex; align-items: center; gap: 8px;
 }
-.gandhi-bot-header h4 { margin: 0; font-size: 14px; }
-.gandhi-bot-header-btns { display: flex; gap: 5px; margin-left: auto; }
-.gandhi-bot-header-btns button {
+.Book-bot-header h4 { margin: 0; font-size: 14px; }
+.Book-bot-header-btns { display: flex; gap: 5px; margin-left: auto; }
+.Book-bot-header-btns button {
     background: rgba(255,255,255,0.2); color: white; border: none;
     padding: 5px 8px; border-radius: 5px; cursor: pointer; font-size: 12px;
 }
-.gandhi-bot-header-btns button:hover { background: rgba(255,255,255,0.4); }
-.gandhi-bot-messages {
+.Book-bot-header-btns button:hover { background: rgba(255,255,255,0.4); }
+.Book-bot-messages {
     flex: 1; overflow-y: auto; padding: 15px;
     background: #f9f7f2;
 }
-.gandhi-bot-msg {
+.Book-bot-msg {
     max-width: 85%; padding: 10px 14px; border-radius: 15px;
     margin: 5px 0; font-size: 13px; line-height: 1.5; word-wrap: break-word;
     position: relative;
 }
-.gandhi-bot-msg.bot { background: white; border: 1px solid #e0d5c0; }
-.gandhi-bot-msg.user { background: #27ae60; color: white; margin-left: auto; }
-.gandhi-bot-msg .src { margin-top: 8px; padding-top: 6px; border-top: 1px solid #ddd; font-size: 10px; color: #888; }
-.gandhi-bot-msg .copy-btn {
+.Book-bot-msg.bot { background: white; border: 1px solid #e0d5c0; }
+.Book-bot-msg.user { background: #27ae60; color: white; margin-left: auto; }
+.Book-bot-msg .src { margin-top: 8px; padding-top: 6px; border-top: 1px solid #ddd; font-size: 10px; color: #888; }
+.Book-bot-msg .copy-btn {
     position: absolute; top: 5px; right: 5px;
     background: rgba(0,0,0,0.1); border: none;
     padding: 3px 8px; border-radius: 10px; cursor: pointer;
     font-size: 10px; opacity: 0; transition: 0.2s;
 }
-.gandhi-bot-msg:hover .copy-btn { opacity: 1; }
-.gandhi-bot-msg .copy-btn:hover { background: rgba(0,0,0,0.2); }
-.gandhi-bot-typing { display: flex; gap: 4px; padding: 10px; }
-.gandhi-bot-typing span { width: 7px; height: 7px; background: #bbb; border-radius: 50%; animation: bounce 1.4s infinite; }
-.gandhi-bot-typing span:nth-child(2) { animation-delay: 0.2s; }
-.gandhi-bot-typing span:nth-child(3) { animation-delay: 0.4s; }
+.Book-bot-msg:hover .copy-btn { opacity: 1; }
+.Book-bot-msg .copy-btn:hover { background: rgba(0,0,0,0.2); }
+.Book-bot-typing { display: flex; gap: 4px; padding: 10px; }
+.Book-bot-typing span { width: 7px; height: 7px; background: #bbb; border-radius: 50%; animation: bounce 1.4s infinite; }
+.Book-bot-typing span:nth-child(2) { animation-delay: 0.2s; }
+.Book-bot-typing span:nth-child(3) { animation-delay: 0.4s; }
 @keyframes bounce { 0%, 60%, 100% { transform: translateY(0); } 30% { transform: translateY(-8px); } }
-.gandhi-bot-input {
+.Book-bot-input {
     padding: 10px; border-top: 1px solid #eee;
     display: flex; gap: 6px; background: white; align-items: center;
 }
-.gandhi-bot-input input {
+.Book-bot-input input {
     flex: 1; padding: 10px 12px; border: 2px solid #ddd;
     border-radius: 20px; outline: none; font-size: 13px;
 }
-.gandhi-bot-input button {
+.Book-bot-input button {
     padding: 10px 16px; background: #27ae60; color: white;
     border: none; border-radius: 20px; cursor: pointer; font-weight: bold;
 }
-.gandhi-bot-suggestions { display: flex; flex-wrap: wrap; gap: 6px; padding: 10px; }
-.gandhi-bot-suggestions button {
+.Book-bot-suggestions { display: flex; flex-wrap: wrap; gap: 6px; padding: 10px; }
+.Book-bot-suggestions button {
     padding: 6px 12px; background: #f0e6d3; border: 1px solid #d4c5a0;
     border-radius: 15px; cursor: pointer; font-size: 11px; color: #5c3d0e;
 }
-.gandhi-bot-branding { text-align: center; padding: 6px; font-size: 9px; color: #bbb; background: #f9f9f9; }
+.Book-bot-branding { text-align: center; padding: 6px; font-size: 9px; color: #bbb; background: #f9f9f9; }
 
 /* Translating animation */
 .translating-indicator {
@@ -106,45 +106,45 @@
     100% { opacity: 0; }
 }
 
-@media (max-width: 450px) { .gandhi-bot-window { width: 100%; height: 100%; bottom: 0; right: 0; border-radius: 0; } }
+@media (max-width: 450px) { .Book-bot-window { width: 100%; height: 100%; bottom: 0; right: 0; border-radius: 0; } }
 </style>
 </head>
 <body>
 
-<button class="gandhi-bot-btn" onclick="gandhiBot.toggle()">🕊️</button>
+<button class="Book-bot-btn" onclick="BookBot.toggle()">🕊️</button>
 
-<div class="gandhi-bot-window" id="gandhiBotWindow">
-    <div class="gandhi-bot-header">
+<div class="Book-bot-window" id="BookBotWindow">
+    <div class="Book-bot-header">
         <span>🕊️</span>
-        <div><h4>Knowledge Bot</h4></div>
-        <div class="gandhi-bot-header-btns">
+        <div><h4>📚 Book Q&A Bot</h4></div>
+        <div class="Book-bot-header-btns">
             <button onclick="exportChat()" title="Export chat">📥</button>
-            <button onclick="gandhiBot.close()" title="Close">✕</button>
+            <button onclick="BookBot.close()" title="Close">✕</button>
         </div>
     </div>
     
-    <div class="gandhi-bot-messages" id="gandhiMessages">
-        <div class="gandhi-bot-msg bot">
-            🙏 <b>Namaste!</b> Ask me about Gandhi's writings.<br>
+    <div class="Book-bot-messages" id="BookMessages">
+        <div class="Book-bot-msg bot">
+           📚 <b>Hello!</b> Ask me anything about your uploaded books.<br>
             <small>🎤 EN | हि | ગુ to speak</small>
         </div>
-        <div class="gandhi-bot-suggestions" id="gandhiSuggestions">
-            <button onclick="gandhiBot.ask('What is Satyagraha?')">Satyagraha?</button>
-            <button onclick="gandhiBot.ask('What is Ahimsa?')">Ahimsa?</button>
-            <button onclick="gandhiBot.ask('Where did Dandi March start?')">Dandi March?</button>
-            <button onclick="gandhiBot.ask('What is Hind Swaraj?')">Hind Swaraj?</button>
+        <div class="Book-bot-suggestions" id="BookSuggestions">
+            <button onclick="BookBot.ask('What is this book about?')">📖 What's this about?</button>
+	    <button onclick="BookBot.ask('Summarize this book')">📝 Summarize</button>
+	    <button onclick="BookBot.ask('What are the key points?')">🔑 Key points</button>
+	    <button onclick="BookBot.ask('Explain the main topic')">💡 Main topic</button>
         </div>
     </div>
     
-    <div class="gandhi-bot-input">
+    <div class="Book-bot-input">
         <button onclick="speak('en-IN')" style="background:#e74c3c;color:white;border:none;border-radius:50%;width:36px;height:36px;min-width:36px;font-size:12px;cursor:pointer;font-weight:bold;">EN</button>
         <button onclick="speak('hi-IN')" style="background:#e67e22;color:white;border:none;border-radius:50%;width:36px;height:36px;min-width:36px;font-size:12px;cursor:pointer;font-weight:bold;">हि</button>
         <button onclick="speak('gu-IN')" style="background:#9b59b6;color:white;border:none;border-radius:50%;width:36px;height:36px;min-width:36px;font-size:12px;cursor:pointer;font-weight:bold;">ગુ</button>
-        <input type="text" id="gandhiInput" placeholder="Type your question..." onkeypress="if(event.key==='Enter')gandhiBot.send()">
-        <button onclick="gandhiBot.send()">➤</button>
+        <input type="text" id="BookInput" placeholder="Type your question..." onkeypress="if(event.key==='Enter')BookBot.send()">
+        <button onclick="BookBot.send()">➤</button>
     </div>
     
-    <div class="gandhi-bot-branding">Powered by AI • Library data only</div>
+    <div class="Book-bot-branding">Powered by AI • 100% Local AI</div>
 </div>
 
 <script>
@@ -155,8 +155,8 @@ function speak(lang) {
     var r = new SR(); r.lang = lang;
     r.onerror = function(e) { if (e.error === 'network') alert('Need internet for voice.'); };
     r.onresult = function(e) {
-        document.getElementById('gandhiInput').value = e.results[0][0].transcript;
-        gandhiBot.send();
+        document.getElementById('BookInput').value = e.results[0][0].transcript;
+        BookBot.send();
     };
     r.start();
 }
@@ -170,9 +170,9 @@ function showToast(msg) {
 
 // Export chat
 function exportChat() {
-    var msgs = document.getElementById('gandhiMessages');
+    var msgs = document.getElementById('BookMessages');
     var text = '';
-    var items = msgs.querySelectorAll('.gandhi-bot-msg');
+    var items = msgs.querySelectorAll('.Book-bot-msg');
     items.forEach(function(item) {
         if (item.classList.contains('user')) text += '🧑 You: ';
         else if (item.classList.contains('bot')) text += '🕊️ Bot: ';
@@ -182,7 +182,7 @@ function exportChat() {
     var blob = new Blob([text], {type: 'text/plain'});
     var a = document.createElement('a');
     a.href = URL.createObjectURL(blob);
-    a.download = 'gandhi-chat-' + new Date().toISOString().slice(0,10) + '.txt';
+    a.download = 'Book-chat-' + new Date().toISOString().slice(0,10) + '.txt';
     a.click();
     showToast('📥 Chat exported!');
 }
@@ -196,42 +196,42 @@ function copyAnswer(btn, text) {
 }
 
 // Bot
-const gandhiBot = {
+const BookBot = {
     apiUrl: 'http://localhost:8000/ask',
     isOpen: false,
     
     toggle: function() {
-        var w = document.getElementById('gandhiBotWindow');
+        var w = document.getElementById('BookBotWindow');
         this.isOpen = !this.isOpen;
-        if (this.isOpen) { w.classList.add('open'); document.getElementById('gandhiInput').focus(); }
+        if (this.isOpen) { w.classList.add('open'); document.getElementById('BookInput').focus(); }
         else { w.classList.remove('open'); }
     },
     
     close: function() {
-        document.getElementById('gandhiBotWindow').classList.remove('open');
+        document.getElementById('BookBotWindow').classList.remove('open');
         this.isOpen = false;
     },
     
     ask: function(q) {
-        document.getElementById('gandhiInput').value = q;
+        document.getElementById('BookInput').value = q;
         this.send();
     },
     
     send: async function() {
-        var input = document.getElementById('gandhiInput');
+        var input = document.getElementById('BookInput');
         var q = input.value.trim();
         if (!q) return;
         
-        var msgs = document.getElementById('gandhiMessages');
-        var sug = document.getElementById('gandhiSuggestions');
+        var msgs = document.getElementById('bookMessages');
+        var sug = document.getElementById('bookSuggestions');
         if (sug) sug.style.display = 'none';
         
         // Add user message
-        msgs.innerHTML += '<div class="gandhi-bot-msg user">' + escapeHtml(q) + '</div>';
+        msgs.innerHTML += '<div class="book-bot-msg user">' + escapeHtml(q) + '</div>';
         
         // Typing indicator
         var tid = 't' + Date.now();
-        msgs.innerHTML += '<div class="gandhi-bot-msg bot" id="' + tid + '"><div class="gandhi-bot-typing"><span></span><span></span><span></span></div></div>';
+        msgs.innerHTML += '<div class="Book-bot-msg bot" id="' + tid + '"><div class="Book-bot-typing"><span></span><span></span><span></span></div></div>';
         
         input.value = '';
         msgs.scrollTop = msgs.scrollHeight;
@@ -271,11 +271,11 @@ const gandhiBot = {
             
             // Add bot message with copy button
             var msgId = 'msg' + Date.now();
-            msgs.innerHTML += '<div class="gandhi-bot-msg bot" id="' + msgId + '"><button class="copy-btn" onclick="copyAnswer(this, `' + data.answer.replace(/`/g, '\\`').replace(/\\/g, '\\\\') + '`)" title="Copy answer">📋</button>' + escapeHtml(data.answer) + srcHtml + '</div>';
+            msgs.innerHTML += '<div class="Book-bot-msg bot" id="' + msgId + '"><button class="copy-btn" onclick="copyAnswer(this, `' + data.answer.replace(/`/g, '\\`').replace(/\\/g, '\\\\') + '`)" title="Copy answer">📋</button>' + escapeHtml(data.answer) + srcHtml + '</div>';
             
         } catch(err) {
             document.getElementById(tid)?.remove();
-            msgs.innerHTML += '<div class="gandhi-bot-msg bot">❌ Server not reachable.<br><small>Run: uvicorn main:app --host 0.0.0.0 --port 8000</small></div>';
+            msgs.innerHTML += '<div class="Book-bot-msg bot">❌ Server not reachable.<br><small>Run: uvicorn main:app --host 0.0.0.0 --port 8000</small></div>';
         }
         
         msgs.scrollTop = msgs.scrollHeight;
