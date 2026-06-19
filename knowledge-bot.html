@@ -13,9 +13,10 @@
     box-shadow: 0 4px 20px rgba(39,174,96,0.5);
     display: flex; align-items: center; justify-content: center;
 }
+.gandhi-bot-btn:hover { transform: scale(1.1); }
 .gandhi-bot-window {
     position: fixed; bottom: 100px; right: 25px;
-    width: 370px; height: 500px; background: white;
+    width: 370px; height: 550px; background: white;
     border-radius: 15px; box-shadow: 0 10px 50px rgba(0,0,0,0.3);
     display: none; flex-direction: column; z-index: 2147483646;
     font-family: Arial, sans-serif; overflow: hidden;
@@ -23,9 +24,16 @@
 .gandhi-bot-window.open { display: flex; }
 .gandhi-bot-header {
     background: linear-gradient(135deg, #2c3e50, #8b4513);
-    color: white; padding: 14px;
-    display: flex; align-items: center; gap: 10px;
+    color: white; padding: 12px 14px;
+    display: flex; align-items: center; gap: 8px;
 }
+.gandhi-bot-header h4 { margin: 0; font-size: 14px; }
+.gandhi-bot-header-btns { display: flex; gap: 5px; margin-left: auto; }
+.gandhi-bot-header-btns button {
+    background: rgba(255,255,255,0.2); color: white; border: none;
+    padding: 5px 8px; border-radius: 5px; cursor: pointer; font-size: 12px;
+}
+.gandhi-bot-header-btns button:hover { background: rgba(255,255,255,0.4); }
 .gandhi-bot-messages {
     flex: 1; overflow-y: auto; padding: 15px;
     background: #f9f7f2;
@@ -33,10 +41,19 @@
 .gandhi-bot-msg {
     max-width: 85%; padding: 10px 14px; border-radius: 15px;
     margin: 5px 0; font-size: 13px; line-height: 1.5; word-wrap: break-word;
+    position: relative;
 }
 .gandhi-bot-msg.bot { background: white; border: 1px solid #e0d5c0; }
 .gandhi-bot-msg.user { background: #27ae60; color: white; margin-left: auto; }
 .gandhi-bot-msg .src { margin-top: 8px; padding-top: 6px; border-top: 1px solid #ddd; font-size: 10px; color: #888; }
+.gandhi-bot-msg .copy-btn {
+    position: absolute; top: 5px; right: 5px;
+    background: rgba(0,0,0,0.1); border: none;
+    padding: 3px 8px; border-radius: 10px; cursor: pointer;
+    font-size: 10px; opacity: 0; transition: 0.2s;
+}
+.gandhi-bot-msg:hover .copy-btn { opacity: 1; }
+.gandhi-bot-msg .copy-btn:hover { background: rgba(0,0,0,0.2); }
 .gandhi-bot-typing { display: flex; gap: 4px; padding: 10px; }
 .gandhi-bot-typing span { width: 7px; height: 7px; background: #bbb; border-radius: 50%; animation: bounce 1.4s infinite; }
 .gandhi-bot-typing span:nth-child(2) { animation-delay: 0.2s; }
@@ -60,6 +77,35 @@
     border-radius: 15px; cursor: pointer; font-size: 11px; color: #5c3d0e;
 }
 .gandhi-bot-branding { text-align: center; padding: 6px; font-size: 9px; color: #bbb; background: #f9f9f9; }
+
+/* Translating animation */
+.translating-indicator {
+    background: #fff3cd; color: #856404; padding: 8px 12px;
+    border-radius: 10px; font-size: 12px; display: flex; align-items: center; gap: 8px;
+    margin: 5px 0; animation: slideIn 0.3s;
+}
+.translating-spinner {
+    width: 14px; height: 14px; border: 2px solid #856404;
+    border-top-color: transparent; border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+@keyframes slideIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+
+/* Toast notification */
+.toast {
+    position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+    background: #333; color: white; padding: 10px 20px;
+    border-radius: 25px; font-size: 13px; z-index: 99999;
+    animation: fadeUp 2s forwards;
+}
+@keyframes fadeUp {
+    0% { opacity: 0; transform: translateX(-50%) translateY(20px); }
+    20% { opacity: 1; transform: translateX(-50%) translateY(0); }
+    80% { opacity: 1; }
+    100% { opacity: 0; }
+}
+
 @media (max-width: 450px) { .gandhi-bot-window { width: 100%; height: 100%; bottom: 0; right: 0; border-radius: 0; } }
 </style>
 </head>
@@ -70,14 +116,17 @@
 <div class="gandhi-bot-window" id="gandhiBotWindow">
     <div class="gandhi-bot-header">
         <span>🕊️</span>
-        <div><b>Knowledge Bot</b></div>
-        <span onclick="gandhiBot.close()" style="margin-left:auto;cursor:pointer;font-size:20px">✕</span>
+        <div><h4>Knowledge Bot</h4></div>
+        <div class="gandhi-bot-header-btns">
+            <button onclick="exportChat()" title="Export chat">📥</button>
+            <button onclick="gandhiBot.close()" title="Close">✕</button>
+        </div>
     </div>
     
     <div class="gandhi-bot-messages" id="gandhiMessages">
         <div class="gandhi-bot-msg bot">
             🙏 <b>Namaste!</b> Ask me about Gandhi's writings.<br>
-            <small>🎤 Click EN | हि | ગુ to speak</small>
+            <small>🎤 EN | हि | ગુ to speak</small>
         </div>
         <div class="gandhi-bot-suggestions" id="gandhiSuggestions">
             <button onclick="gandhiBot.ask('What is Satyagraha?')">Satyagraha?</button>
@@ -103,21 +152,47 @@
 function speak(lang) {
     var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (!SR) { alert('Voice works only in Chrome.'); return; }
-    
-    var r = new SR();
-    r.lang = lang;
-    
-    r.onstart = function() { console.log('Listening: ' + lang); };
-    r.onerror = function(e) { 
-        if (e.error === 'not-allowed') alert('Allow microphone in browser settings.');
-        else if (e.error === 'network') alert('Need internet for voice.');
-        else console.log('Voice error:', e.error);
-    };
+    var r = new SR(); r.lang = lang;
+    r.onerror = function(e) { if (e.error === 'network') alert('Need internet for voice.'); };
     r.onresult = function(e) {
         document.getElementById('gandhiInput').value = e.results[0][0].transcript;
         gandhiBot.send();
     };
     r.start();
+}
+
+// Toast notification
+function showToast(msg) {
+    var t = document.createElement('div'); t.className = 'toast'; t.textContent = msg;
+    document.body.appendChild(t);
+    setTimeout(function() { t.remove(); }, 2000);
+}
+
+// Export chat
+function exportChat() {
+    var msgs = document.getElementById('gandhiMessages');
+    var text = '';
+    var items = msgs.querySelectorAll('.gandhi-bot-msg');
+    items.forEach(function(item) {
+        if (item.classList.contains('user')) text += '🧑 You: ';
+        else if (item.classList.contains('bot')) text += '🕊️ Bot: ';
+        text += item.textContent.replace('📋 Copied!', '').trim() + '\n\n---\n\n';
+    });
+    
+    var blob = new Blob([text], {type: 'text/plain'});
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'gandhi-chat-' + new Date().toISOString().slice(0,10) + '.txt';
+    a.click();
+    showToast('📥 Chat exported!');
+}
+
+// Copy answer
+function copyAnswer(btn, text) {
+    navigator.clipboard.writeText(text).then(function() {
+        btn.textContent = '📋 Copied!';
+        setTimeout(function() { btn.textContent = '📋'; }, 1500);
+    });
 }
 
 // Bot
@@ -151,8 +226,10 @@ const gandhiBot = {
         var sug = document.getElementById('gandhiSuggestions');
         if (sug) sug.style.display = 'none';
         
-        msgs.innerHTML += '<div class="gandhi-bot-msg user">' + q + '</div>';
+        // Add user message
+        msgs.innerHTML += '<div class="gandhi-bot-msg user">' + escapeHtml(q) + '</div>';
         
+        // Typing indicator
         var tid = 't' + Date.now();
         msgs.innerHTML += '<div class="gandhi-bot-msg bot" id="' + tid + '"><div class="gandhi-bot-typing"><span></span><span></span><span></span></div></div>';
         
@@ -167,16 +244,35 @@ const gandhiBot = {
             });
             var data = await res.json();
             
+            // Remove typing
             document.getElementById(tid)?.remove();
             
-            var src = '';
-            if (data.sources && data.sources.length > 0) {
-                src = '<div class="src">📚 ';
-                data.sources.forEach(function(s) { src += '📖 ' + s.book + ' (Pg ' + s.page + ') | '; });
-                src += '</div>';
+            // Detect if translating (if question is Hindi/Gujarati)
+            var isTranslated = /[\u0900-\u097F\u0A80-\u0AFF]/.test(q);
+            
+            if (isTranslated) {
+                // Show translating animation
+                var transId = 'trans' + Date.now();
+                msgs.innerHTML += '<div class="translating-indicator" id="' + transId + '"><div class="translating-spinner"></div> Translating to your language...</div>';
+                msgs.scrollTop = msgs.scrollHeight;
+                
+                // Simulate translation delay (remove after 1 second)
+                await new Promise(function(r) { setTimeout(r, 1000); });
+                document.getElementById(transId)?.remove();
             }
             
-            msgs.innerHTML += '<div class="gandhi-bot-msg bot">' + data.answer + src + '</div>';
+            // Build sources HTML
+            var srcHtml = '';
+            if (data.sources && data.sources.length > 0) {
+                srcHtml = '<div class="src">📚 ';
+                data.sources.forEach(function(s) { srcHtml += '📖 ' + s.book + ' (Pg ' + s.page + ') | '; });
+                srcHtml += '</div>';
+            }
+            
+            // Add bot message with copy button
+            var msgId = 'msg' + Date.now();
+            msgs.innerHTML += '<div class="gandhi-bot-msg bot" id="' + msgId + '"><button class="copy-btn" onclick="copyAnswer(this, `' + data.answer.replace(/`/g, '\\`').replace(/\\/g, '\\\\') + '`)" title="Copy answer">📋</button>' + escapeHtml(data.answer) + srcHtml + '</div>';
+            
         } catch(err) {
             document.getElementById(tid)?.remove();
             msgs.innerHTML += '<div class="gandhi-bot-msg bot">❌ Server not reachable.<br><small>Run: uvicorn main:app --host 0.0.0.0 --port 8000</small></div>';
@@ -186,6 +282,12 @@ const gandhiBot = {
         input.focus();
     }
 };
+
+function escapeHtml(text) {
+    var div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
 </script>
 
 </body>
