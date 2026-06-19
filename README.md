@@ -1,142 +1,36 @@
-\# 🕊️ Gandhi Knowledge Assistant
+---
 
+## 🚀 Quick Start (5 Minutes)
 
+### Prerequisites
+- ✅ Python 3.10+ installed
+- ✅ Git installed
+- ✅ 8GB+ RAM (for LLM)
 
-\*\*AI-Powered Digital Library \& Research Assistant for Gandhian Literature\*\*
-
-
-
-\[!\[Python](https://img.shields.io/badge/Python-3.11-blue)](https://python.org)
-
-\[!\[FastAPI](https://img.shields.io/badge/FastAPI-0.115-green)](https://fastapi.tiangolo.com)
-
-\[!\[React](https://img.shields.io/badge/React-19-blue)](https://react.dev)
-
-\[!\[Ollama](https://img.shields.io/badge/Ollama-Local%20LLM-orange)](https://ollama.ai)
-
-
-
-\---
-
-
-
-\## 📖 About
-
-
-
-A RAG-based chatbot that answers questions about Mahatma Gandhi's writings by searching through digitized books and providing answers with \*\*book name and page citations\*\*.
-
-
-
-\---
-
-
-
-\## ✨ Features
-
-
-
-\- 🔍 \*\*Smart Search\*\* — Find answers across multiple books
-
-\- 📚 \*\*Source Citations\*\* — Every answer includes book name \& page number
-
-\- 🎯 \*\*RAG Pipeline\*\* — Retrieval-Augmented Generation for accurate answers
-
-\- 🖥️ \*\*Beautiful UI\*\* — React-based chat interface
-
-\- 🗄️ \*\*Vector Database\*\* — Fast semantic search with Qdrant
-
-\- 🤖 \*\*Local LLM\*\* — Privacy-first with Ollama \& Qwen 2.5
-
-\- 📄 \*\*PDF Processing\*\* — Automatic text extraction from books
-
-
-
-\---
-
-
-
-\## 🛠️ Tech Stack
-
-
-
-| Layer | Technology |
-
-|-------|------------|
-
-| \*\*Frontend\*\* | React, Vite |
-
-| \*\*Backend\*\* | FastAPI, Python |
-
-| \*\*AI Model\*\* | Ollama, Qwen 2.5 (3B) |
-
-| \*\*Embeddings\*\* | Sentence Transformers (all-MiniLM-L6-v2) |
-
-| \*\*Vector DB\*\* | Qdrant |
-
-| \*\*PDF Processing\*\* | PyMuPDF |
-
-
-
-\---
-
-
-
-\## 🚀 Getting Started
-
-
-
-\### Prerequisites
-
-\- Python 3.10+
-
-\- Node.js 18+
-
-\- Ollama (\[Install](https://ollama.ai))
-
-
-
-\### Installation
-
-
-
+### Setup Commands
 ```bash
-
-\# Clone the repository
-
+# 1. Clone
 git clone https://github.com/kanetiyahet/Knowledge-Assistant.git
+cd Knowledge-Assistant
 
-cd gandhi-knowledge-assistant
-
-
-
-\# Create virtual environment
-
+# 2. Setup Python (Windows)
 python -m venv venv
-
-venv\\Scripts\\activate  # Windows
-
-\# source venv/bin/activate  # Mac/Linux
-
-
-
-\# Install Python dependencies
-
+venv\Scripts\activate
 pip install -r requirements.txt
 
-
-
-\# Pull the LLM model
-
+# 3. Install Ollama & Pull Model
+# Download Ollama from https://ollama.ai
 ollama pull qwen2.5:3b
 
+# 4. Add books to folder
+mkdir books
+# Copy PDFs into books/ folder
 
+# 5. Index books
+python index_data.py
 
-\# Install frontend dependencies
+# 6. Start backend
+uvicorn main:app --host 0.0.0.0 --port 8000
 
-cd frontend
-
-npm install
-
-cd ..
-
+# 7. Open chatbot widget
+start knowledge-bot.html
