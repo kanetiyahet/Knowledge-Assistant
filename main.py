@@ -86,8 +86,8 @@ def translate_sarvam(text, source_lang, target_lang):
     return text
 
 # ============ SIMPLE ANSWER FROM CHUNKS ============
-def extract_answer(chunks, lang):
-    """Extract best answer directly from chunks - NO LLM needed"""
+def extract_answer(chunks, lang, question):
+    """Use LLM to generate clean summarized answer"""
     
     if not chunks:
         not_found = {
@@ -97,23 +97,46 @@ def extract_answer(chunks, lang):
         }
         return not_found.get(lang, not_found["english"])
     
-    # Take the best matching chunk
-    best = chunks[0]
-    book = best.payload.get('book', 'Unknown')
-    page = best.payload.get('page', 0)
-    text = best.payload.get('text', '')[:400]
+    # Build context from top chunks
+    context = ""
+    sources_list = []
+    for i, chunk in enumerate(chunks[:2]):
+        book = chunk.payload.get('book', 'Unknown')
+        page = chunk.payload.get('page', 0)
+        text = chunk.payload.get('text', '')[:400]
+        context += f"[{i+1}] {book}, Page {page}:\n{text}\n\n"
+        sources_list.append(f"📖 {book} (Page {page})")
     
-    # Build English answer
-    english_answer = f"📖 From {book} (Page {page}):\n\n\"{text}...\""
+    # Language instruction
+    lang_instruction = {
+        "english": "Answer in English in 2-3 sentences.",
+        "hindi": "हिंदी में 2-3 वाक्यों में उत्तर दें।",
+        "gujarati": "ગુજરાતીમાં 2-3 વાક્યોમાં જવાબ આપો."
+    }
     
-    # Translate to user's language if needed
-    if lang == "english":
-        return english_answer
-    elif lang in ["hindi", "gujarati"]:
-        translated = translate_sarvam(english_answer, "english", lang)
-        return translated if translated else english_answer
+    prompt = f"""{lang_instruction.get(lang, 'Answer in English.')}
+Use ONLY the context below. Be accurate and mention the source.
+
+Context:
+{context}
+
+Question: {question}
+Answer:"""
     
-    return english_answer
+    try:
+        response = ollama.chat(model="qwen2.5:3b", messages=[{"role": "user", "content": prompt}])
+        answer = response["message"]["content"].strip()
+    except:
+        # Fallback
+        text = chunks[0].payload.get('text', '')[:300]
+        book = chunks[0].payload.get('book', '')
+        page = chunks[0].payload.get('page', 0)
+        answer = f"From {book} (Page {page}):\n\"{text}...\""
+    
+    # Add sources
+    answer += f"\n\n📚 Sources: {' | '.join(sources_list)}"
+    
+    return answer
 
 # ============ MAIN ENDPOINT ============
 @app.post("/ask", response_model=QueryResponse)
@@ -133,7 +156,7 @@ async def ask_question(req: QueryRequest):
     ).points
     
     # Extract answer directly from chunks
-    answer = extract_answer(search_result, lang)
+    answer = extract_answer(search_result, lang, original_question)
     print(f"✅ Answer: {answer[:150]}...")
     
     # Prepare sources

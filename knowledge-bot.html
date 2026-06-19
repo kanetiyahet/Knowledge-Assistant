@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Knowledge Bot</title>
+<style>
+.gandhi-bot-btn {
+    position: fixed !important; bottom: 25px !important; right: 25px !important;
+    width: 60px !important; height: 60px !important; background: #27ae60 !important;
+    border: none !important; border-radius: 50% !important; font-size: 28px !important;
+    cursor: pointer !important; z-index: 2147483647 !important;
+    box-shadow: 0 4px 20px rgba(39,174,96,0.5) !important;
+    display: flex !important; align-items: center !important; justify-content: center !important;
+    transition: 0.3s !important;
+}
+.gandhi-bot-btn:hover { transform: scale(1.1) !important; }
+.gandhi-bot-window {
+    position: fixed !important; bottom: 100px !important; right: 25px !important;
+    width: 370px !important; height: 520px !important; background: white !important;
+    border-radius: 15px !important; box-shadow: 0 10px 50px rgba(0,0,0,0.3) !important;
+    display: none !important; flex-direction: column !important; z-index: 2147483646 !important;
+    font-family: 'Segoe UI', Arial, sans-serif !important; overflow: hidden !important;
+}
+.gandhi-bot-window.open { display: flex !important; }
+.gandhi-bot-header {
+    background: linear-gradient(135deg, #2c3e50, #8b4513) !important;
+    color: white !important; padding: 14px 16px !important;
+    display: flex !important; align-items: center !important; gap: 10px !important;
+}
+.gandhi-bot-header h4 { margin: 0 !important; font-size: 14px !important; }
+.gandhi-bot-close {
+    margin-left: auto !important; background: none !important; border: none !important;
+    color: white !important; font-size: 22px !important; cursor: pointer !important;
+}
+.gandhi-bot-messages {
+    flex: 1 !important; overflow-y: auto !important; padding: 15px !important;
+    background: #f9f7f2 !important; display: flex !important; flex-direction: column !important; gap: 10px !important;
+}
+.gandhi-bot-msg {
+    max-width: 85% !important; padding: 10px 14px !important; border-radius: 15px !important;
+    font-size: 13px !important; line-height: 1.5 !important; word-wrap: break-word !important;
+}
+.gandhi-bot-msg.bot { background: white !important; border: 1px solid #e0d5c0 !important; align-self: flex-start !important; }
+.gandhi-bot-msg.user { background: #27ae60 !important; color: white !important; align-self: flex-end !important; }
+.gandhi-bot-msg .src { margin-top: 8px !important; padding-top: 6px !important; border-top: 1px solid #ddd !important; font-size: 10px !important; color: #888 !important; }
+.gandhi-bot-typing { display: flex !important; gap: 4px !important; padding: 10px 14px !important; }
+.gandhi-bot-typing span { width: 7px !important; height: 7px !important; background: #bbb !important; border-radius: 50% !important; animation: bounce 1.4s infinite !important; }
+.gandhi-bot-typing span:nth-child(2) { animation-delay: 0.2s !important; }
+.gandhi-bot-typing span:nth-child(3) { animation-delay: 0.4s !important; }
+@keyframes bounce { 0%, 60%, 100% { transform: translateY(0); } 30% { transform: translateY(-8px); } }
+.gandhi-bot-input { padding: 12px !important; border-top: 1px solid #eee !important; display: flex !important; gap: 8px !important; background: white !important; }
+.gandhi-bot-input input { flex: 1 !important; padding: 10px 14px !important; border: 2px solid #e0d5c0 !important; border-radius: 20px !important; outline: none !important; font-size: 13px !important; }
+.gandhi-bot-input button { padding: 10px 18px !important; background: #27ae60 !important; color: white !important; border: none !important; border-radius: 20px !important; cursor: pointer !important; font-weight: bold !important; }
+#voiceBtn {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 0 !important;
+    min-width: 40px !important;
+    flex-shrink: 0 !important;
+}
+.gandhi-bot-suggestions { display: flex !important; flex-wrap: wrap !important; gap: 6px !important; padding: 10px 15px !important; }
+.gandhi-bot-suggestions button { padding: 6px 12px !important; background: #f0e6d3 !important; border: 1px solid #d4c5a0 !important; border-radius: 15px !important; cursor: pointer !important; font-size: 11px !important; color: #5c3d0e !important; }
+.gandhi-bot-branding { text-align: center !important; padding: 6px !important; font-size: 9px !important; color: #bbb !important; background: #f9f9f9 !important; }
+.voice-btn { animation: pulse 1.5s infinite !important; }
+@keyframes pulse { 0%, 100% { box-shadow: 0 0 0 0 rgba(231,76,60,0.4); } 50% { box-shadow: 0 0 0 12px rgba(231,76,60,0); } }
+@media (max-width: 450px) { .gandhi-bot-window { width: 100% !important; height: 100% !important; bottom: 0 !important; right: 0 !important; border-radius: 0 !important; } }
+</style>
+</head>
+<body>
+
+<button class="gandhi-bot-btn" onclick="gandhiBot.toggle()">🕊️</button>
+
+<div class="gandhi-bot-window" id="gandhiBotWindow">
+    <div class="gandhi-bot-header">
+        <span>🕊️</span>
+        <div><h4>Knowledge Bot</h4></div>
+        <button class="gandhi-bot-close" onclick="gandhiBot.close()">✕</button>
+    </div>
+    
+    <div class="gandhi-bot-messages" id="gandhiMessages">
+        <div class="gandhi-bot-msg bot">
+            🙏 <b>Namaste!</b> I answer from Gandhi's writings.<br>
+            <small>🎤 Click red mic to speak</small>
+        </div>
+        <div class="gandhi-bot-suggestions" id="gandhiSuggestions">
+            <button onclick="gandhiBot.ask('What is Satyagraha?')">What is Satyagraha?</button>
+            <button onclick="gandhiBot.ask('What is Ahimsa?')">What is Ahimsa?</button>
+            <button onclick="gandhiBot.ask('Where did Dandi March start?')">Dandi March</button>
+            <button onclick="gandhiBot.ask('What is Hind Swaraj?')">Hind Swaraj</button>
+        </div>
+    </div>
+    
+    <div class="gandhi-bot-input">
+        <button id="voiceBtn" onclick="startVoice()" style="background:#e74c3c;color:white;border:none;border-radius:50%;width:40px;height:40px;min-width:40px;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0;" title="Click to speak">🎤</button>
+        <input type="text" id="gandhiInput" placeholder="Type or speak..." onkeypress="if(event.key==='Enter')gandhiBot.send()">
+        <button onclick="gandhiBot.send()">➤</button>
+    </div>
+    
+    <div class="gandhi-bot-branding">Powered by AI • Library data only</div>
+</div>
+
+<script>
+// 🎤 Voice Input Function (outside gandhiBot)
+function startVoice() {
+    var SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SpeechRecognition) {
+        alert('Voice input works only in Chrome. Please open in Chrome browser.');
+        return;
+    }
+    
+    var recognition = new SpeechRecognition();
+    recognition.lang = 'en-US';
+    var btn = document.getElementById('voiceBtn');
+    
+    recognition.onstart = function() { btn.textContent = '🔴'; };
+    recognition.onend = function() { btn.textContent = '🎤'; };
+    recognition.onerror = function() { btn.textContent = '🎤'; };
+    
+    recognition.onresult = function(event) {
+        var transcript = event.results[0][0].transcript;
+        document.getElementById('gandhiInput').value = transcript;
+        gandhiBot.send();
+    };
+    
+    recognition.start();
+}
+
+// ============ GANDHI BOT ============
+const gandhiBot = {
+    apiUrl: 'http://localhost:8000/ask',
+    isOpen: false,
+    
+    toggle: function() {
+        var win = document.getElementById('gandhiBotWindow');
+        this.isOpen = !this.isOpen;
+        if (this.isOpen) { win.classList.add('open'); document.getElementById('gandhiInput').focus(); }
+        else { win.classList.remove('open'); }
+    },
+    
+    close: function() {
+        document.getElementById('gandhiBotWindow').classList.remove('open');
+        this.isOpen = false;
+    },
+    
+    ask: function(question) {
+        document.getElementById('gandhiInput').value = question;
+        this.send();
+    },
+    
+    send: async function() {
+        var input = document.getElementById('gandhiInput');
+        var question = input.value.trim();
+        if (!question) return;
+        
+        var messages = document.getElementById('gandhiMessages');
+        var suggestions = document.getElementById('gandhiSuggestions');
+        if (suggestions) suggestions.style.display = 'none';
+        
+        messages.innerHTML += '<div class="gandhi-bot-msg user">' + question + '</div>';
+        
+        var typingId = 'typing' + Date.now();
+        messages.innerHTML += '<div class="gandhi-bot-msg bot" id="' + typingId + '"><div class="gandhi-bot-typing"><span></span><span></span><span></span></div></div>';
+        
+        input.value = '';
+        messages.scrollTop = messages.scrollHeight;
+        
+        try {
+            var res = await fetch(this.apiUrl, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({question: question})
+            });
+            var data = await res.json();
+            
+            document.getElementById(typingId)?.remove();
+            
+            var srcHtml = '';
+            if (data.sources && data.sources.length > 0) {
+                srcHtml = '<div class="src">📚 ';
+                data.sources.forEach(function(s) { srcHtml += '📖 ' + s.book + ' (Pg ' + s.page + ') | '; });
+                srcHtml += '</div>';
+            }
+            
+            messages.innerHTML += '<div class="gandhi-bot-msg bot">' + data.answer + srcHtml + '</div>';
+        } catch(err) {
+            document.getElementById(typingId)?.remove();
+            messages.innerHTML += '<div class="gandhi-bot-msg bot">❌ Server not reachable.<br><small>Start: uvicorn main:app --host 0.0.0.0 --port 8000</small></div>';
+        }
+        
+        messages.scrollTop = messages.scrollHeight;
+        input.focus();
+    }
+};
+</script>
+
+</body>
+</html>
