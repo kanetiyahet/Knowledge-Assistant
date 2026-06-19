@@ -3,9 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Knowledge Bot</title>
+<title>Book Q&A Bot</title>
 <style>
-.Book-bot-btn {
+.book-bot-btn {
     position: fixed; bottom: 25px; right: 25px;
     width: 60px; height: 60px; background: #27ae60;
     border: none; border-radius: 50%; font-size: 28px;
@@ -13,212 +13,160 @@
     box-shadow: 0 4px 20px rgba(39,174,96,0.5);
     display: flex; align-items: center; justify-content: center;
 }
-.Book-bot-btn:hover { transform: scale(1.1); }
-.Book-bot-window {
+.book-bot-btn:hover { transform: scale(1.1); }
+.book-bot-window {
     position: fixed; bottom: 100px; right: 25px;
     width: 370px; height: 550px; background: white;
     border-radius: 15px; box-shadow: 0 10px 50px rgba(0,0,0,0.3);
     display: none; flex-direction: column; z-index: 2147483646;
     font-family: Arial, sans-serif; overflow: hidden;
 }
-.Book-bot-window.open { display: flex; }
-.Book-bot-header {
+.book-bot-window.open { display: flex; }
+.book-bot-header {
     background: linear-gradient(135deg, #2c3e50, #8b4513);
     color: white; padding: 12px 14px;
     display: flex; align-items: center; gap: 8px;
 }
-.Book-bot-header h4 { margin: 0; font-size: 14px; }
-.Book-bot-header-btns { display: flex; gap: 5px; margin-left: auto; }
-.Book-bot-header-btns button {
+.book-bot-header h4 { margin: 0; font-size: 14px; }
+.book-bot-header-btns { display: flex; gap: 5px; margin-left: auto; }
+.book-bot-header-btns button {
     background: rgba(255,255,255,0.2); color: white; border: none;
     padding: 5px 8px; border-radius: 5px; cursor: pointer; font-size: 12px;
 }
-.Book-bot-header-btns button:hover { background: rgba(255,255,255,0.4); }
-.Book-bot-messages {
-    flex: 1; overflow-y: auto; padding: 15px;
-    background: #f9f7f2;
+.book-bot-messages {
+    flex: 1; overflow-y: auto; padding: 15px; background: #f9f7f2;
 }
-.Book-bot-msg {
+.book-bot-msg {
     max-width: 85%; padding: 10px 14px; border-radius: 15px;
     margin: 5px 0; font-size: 13px; line-height: 1.5; word-wrap: break-word;
     position: relative;
 }
-.Book-bot-msg.bot { background: white; border: 1px solid #e0d5c0; }
-.Book-bot-msg.user { background: #27ae60; color: white; margin-left: auto; }
-.Book-bot-msg .src { margin-top: 8px; padding-top: 6px; border-top: 1px solid #ddd; font-size: 10px; color: #888; }
-.Book-bot-msg .copy-btn {
+.book-bot-msg.bot { background: white; border: 1px solid #e0d5c0; }
+.book-bot-msg.user { background: #27ae60; color: white; margin-left: auto; }
+.book-bot-msg .src { margin-top: 8px; padding-top: 6px; border-top: 1px solid #ddd; font-size: 10px; color: #888; }
+.book-bot-msg .copy-btn {
     position: absolute; top: 5px; right: 5px;
     background: rgba(0,0,0,0.1); border: none;
     padding: 3px 8px; border-radius: 10px; cursor: pointer;
     font-size: 10px; opacity: 0; transition: 0.2s;
 }
-.Book-bot-msg:hover .copy-btn { opacity: 1; }
-.Book-bot-msg .copy-btn:hover { background: rgba(0,0,0,0.2); }
-.Book-bot-typing { display: flex; gap: 4px; padding: 10px; }
-.Book-bot-typing span { width: 7px; height: 7px; background: #bbb; border-radius: 50%; animation: bounce 1.4s infinite; }
-.Book-bot-typing span:nth-child(2) { animation-delay: 0.2s; }
-.Book-bot-typing span:nth-child(3) { animation-delay: 0.4s; }
+.book-bot-msg:hover .copy-btn { opacity: 1; }
+.book-bot-typing { display: flex; gap: 4px; padding: 10px; }
+.book-bot-typing span { width: 7px; height: 7px; background: #bbb; border-radius: 50%; animation: bounce 1.4s infinite; }
+.book-bot-typing span:nth-child(2) { animation-delay: 0.2s; }
+.book-bot-typing span:nth-child(3) { animation-delay: 0.4s; }
 @keyframes bounce { 0%, 60%, 100% { transform: translateY(0); } 30% { transform: translateY(-8px); } }
-.Book-bot-input {
-    padding: 10px; border-top: 1px solid #eee;
-    display: flex; gap: 6px; background: white; align-items: center;
-}
-.Book-bot-input input {
-    flex: 1; padding: 10px 12px; border: 2px solid #ddd;
-    border-radius: 20px; outline: none; font-size: 13px;
-}
-.Book-bot-input button {
-    padding: 10px 16px; background: #27ae60; color: white;
-    border: none; border-radius: 20px; cursor: pointer; font-weight: bold;
-}
-.Book-bot-suggestions { display: flex; flex-wrap: wrap; gap: 6px; padding: 10px; }
-.Book-bot-suggestions button {
-    padding: 6px 12px; background: #f0e6d3; border: 1px solid #d4c5a0;
-    border-radius: 15px; cursor: pointer; font-size: 11px; color: #5c3d0e;
-}
-.Book-bot-branding { text-align: center; padding: 6px; font-size: 9px; color: #bbb; background: #f9f9f9; }
-
-/* Translating animation */
-.translating-indicator {
-    background: #fff3cd; color: #856404; padding: 8px 12px;
-    border-radius: 10px; font-size: 12px; display: flex; align-items: center; gap: 8px;
-    margin: 5px 0; animation: slideIn 0.3s;
-}
-.translating-spinner {
-    width: 14px; height: 14px; border: 2px solid #856404;
-    border-top-color: transparent; border-radius: 50%;
-    animation: spin 0.8s linear infinite;
-}
+.book-bot-input { padding: 10px; border-top: 1px solid #eee; display: flex; gap: 6px; background: white; align-items: center; }
+.book-bot-input input { flex: 1; padding: 10px 12px; border: 2px solid #ddd; border-radius: 20px; outline: none; font-size: 13px; }
+.book-bot-input button { padding: 10px 16px; background: #27ae60; color: white; border: none; border-radius: 20px; cursor: pointer; font-weight: bold; }
+.book-bot-suggestions { display: flex; flex-wrap: wrap; gap: 6px; padding: 10px; }
+.book-bot-suggestions button { padding: 6px 12px; background: #f0e6d3; border: 1px solid #d4c5a0; border-radius: 15px; cursor: pointer; font-size: 11px; color: #5c3d0e; }
+.book-bot-branding { text-align: center; padding: 6px; font-size: 9px; color: #bbb; background: #f9f9f9; }
+.translating-indicator { background: #fff3cd; color: #856404; padding: 8px 12px; border-radius: 10px; font-size: 12px; display: flex; align-items: center; gap: 8px; margin: 5px 0; }
+.translating-spinner { width: 14px; height: 14px; border: 2px solid #856404; border-top-color: transparent; border-radius: 50%; animation: spin 0.8s linear infinite; }
 @keyframes spin { to { transform: rotate(360deg); } }
-@keyframes slideIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
-
-/* Toast notification */
-.toast {
-    position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
-    background: #333; color: white; padding: 10px 20px;
-    border-radius: 25px; font-size: 13px; z-index: 99999;
-    animation: fadeUp 2s forwards;
-}
-@keyframes fadeUp {
-    0% { opacity: 0; transform: translateX(-50%) translateY(20px); }
-    20% { opacity: 1; transform: translateX(-50%) translateY(0); }
-    80% { opacity: 1; }
-    100% { opacity: 0; }
-}
-
-@media (max-width: 450px) { .Book-bot-window { width: 100%; height: 100%; bottom: 0; right: 0; border-radius: 0; } }
+.toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: #333; color: white; padding: 10px 20px; border-radius: 25px; font-size: 13px; z-index: 99999; animation: fadeUp 2s forwards; }
+@keyframes fadeUp { 0% { opacity: 0; transform: translateX(-50%) translateY(20px); } 20% { opacity: 1; transform: translateX(-50%) translateY(0); } 80% { opacity: 1; } 100% { opacity: 0; } }
+@media (max-width: 450px) { .book-bot-window { width: 100%; height: 100%; bottom: 0; right: 0; border-radius: 0; } }
 </style>
 </head>
 <body>
 
-<button class="Book-bot-btn" onclick="BookBot.toggle()">🕊️</button>
+<button class="book-bot-btn" onclick="bookBot.toggle()">📚</button>
 
-<div class="Book-bot-window" id="BookBotWindow">
-    <div class="Book-bot-header">
-        <span>🕊️</span>
-        <div><h4>📚 Book Q&A Bot</h4></div>
-        <div class="Book-bot-header-btns">
+<div class="book-bot-window" id="bookBotWindow">
+    <div class="book-bot-header">
+        <span>📚</span>
+        <div><h4>Book Q&A Bot</h4></div>
+        <div class="book-bot-header-btns">
             <button onclick="exportChat()" title="Export chat">📥</button>
-            <button onclick="BookBot.close()" title="Close">✕</button>
+            <button onclick="bookBot.close()" title="Close">✕</button>
         </div>
     </div>
     
-    <div class="Book-bot-messages" id="BookMessages">
-        <div class="Book-bot-msg bot">
-           📚 <b>Hello!</b> Ask me anything about your uploaded books.<br>
+    <div class="book-bot-messages" id="bookMessages">
+        <div class="book-bot-msg bot">
+            📚 <b>Hello!</b> Ask me anything about your uploaded books.<br>
             <small>🎤 EN | हि | ગુ to speak</small>
         </div>
-        <div class="Book-bot-suggestions" id="BookSuggestions">
-            <button onclick="BookBot.ask('What is this book about?')">📖 What's this about?</button>
-	    <button onclick="BookBot.ask('Summarize this book')">📝 Summarize</button>
-	    <button onclick="BookBot.ask('What are the key points?')">🔑 Key points</button>
-	    <button onclick="BookBot.ask('Explain the main topic')">💡 Main topic</button>
+        <div class="book-bot-suggestions" id="bookSuggestions">
+            <button onclick="bookBot.ask('What is this book about?')">📖 What's this about?</button>
+            <button onclick="bookBot.ask('Summarize this book')">📝 Summarize</button>
+            <button onclick="bookBot.ask('What are the key points?')">🔑 Key points</button>
+            <button onclick="bookBot.ask('Explain the main topic')">💡 Main topic</button>
         </div>
     </div>
     
-    <div class="Book-bot-input">
+    <div class="book-bot-input">
         <button onclick="speak('en-IN')" style="background:#e74c3c;color:white;border:none;border-radius:50%;width:36px;height:36px;min-width:36px;font-size:12px;cursor:pointer;font-weight:bold;">EN</button>
         <button onclick="speak('hi-IN')" style="background:#e67e22;color:white;border:none;border-radius:50%;width:36px;height:36px;min-width:36px;font-size:12px;cursor:pointer;font-weight:bold;">हि</button>
         <button onclick="speak('gu-IN')" style="background:#9b59b6;color:white;border:none;border-radius:50%;width:36px;height:36px;min-width:36px;font-size:12px;cursor:pointer;font-weight:bold;">ગુ</button>
-        <input type="text" id="BookInput" placeholder="Type your question..." onkeypress="if(event.key==='Enter')BookBot.send()">
-        <button onclick="BookBot.send()">➤</button>
+        <input type="text" id="bookInput" placeholder="Type your question..." onkeydown="if(event.key==='Enter'){event.preventDefault();bookBot.send();}">
+        <button onclick="bookBot.send()">➤</button>
     </div>
     
-    <div class="Book-bot-branding">Powered by AI • 100% Local AI</div>
+    <div class="book-bot-branding">Answers from your uploaded books • 100% Local AI</div>
 </div>
 
 <script>
-// Voice function
 function speak(lang) {
     var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (!SR) { alert('Voice works only in Chrome.'); return; }
     var r = new SR(); r.lang = lang;
     r.onerror = function(e) { if (e.error === 'network') alert('Need internet for voice.'); };
     r.onresult = function(e) {
-        document.getElementById('BookInput').value = e.results[0][0].transcript;
-        BookBot.send();
+        document.getElementById('bookInput').value = e.results[0][0].transcript;
+        bookBot.send();
     };
     r.start();
 }
 
-// Toast notification
 function showToast(msg) {
     var t = document.createElement('div'); t.className = 'toast'; t.textContent = msg;
     document.body.appendChild(t);
     setTimeout(function() { t.remove(); }, 2000);
 }
 
-// Export chat
 function exportChat() {
-    var msgs = document.getElementById('BookMessages');
+    var msgs = document.getElementById('bookMessages');
     var text = '';
-    var items = msgs.querySelectorAll('.Book-bot-msg');
+    var items = msgs.querySelectorAll('.book-bot-msg');
     items.forEach(function(item) {
-        if (item.classList.contains('user')) text += '🧑 You: ';
-        else if (item.classList.contains('bot')) text += '🕊️ Bot: ';
-        text += item.textContent.replace('📋 Copied!', '').trim() + '\n\n---\n\n';
+        if (item.classList.contains('user')) text += 'You: ';
+        else text += 'Bot: ';
+        text += item.textContent.replace('Copied!', '').trim() + '\n\n---\n\n';
     });
-    
     var blob = new Blob([text], {type: 'text/plain'});
     var a = document.createElement('a');
     a.href = URL.createObjectURL(blob);
-    a.download = 'Book-chat-' + new Date().toISOString().slice(0,10) + '.txt';
+    a.download = 'chat-' + new Date().toISOString().slice(0,10) + '.txt';
     a.click();
-    showToast('📥 Chat exported!');
+    showToast('Chat exported!');
 }
 
-// Copy answer
-function copyAnswer(btn, text) {
-    navigator.clipboard.writeText(text).then(function() {
-        btn.textContent = '📋 Copied!';
-        setTimeout(function() { btn.textContent = '📋'; }, 1500);
-    });
-}
-
-// Bot
-const BookBot = {
+const bookBot = {
     apiUrl: 'http://localhost:8000/ask',
     isOpen: false,
     
     toggle: function() {
-        var w = document.getElementById('BookBotWindow');
+        var w = document.getElementById('bookBotWindow');
         this.isOpen = !this.isOpen;
-        if (this.isOpen) { w.classList.add('open'); document.getElementById('BookInput').focus(); }
+        if (this.isOpen) { w.classList.add('open'); document.getElementById('bookInput').focus(); }
         else { w.classList.remove('open'); }
     },
     
     close: function() {
-        document.getElementById('BookBotWindow').classList.remove('open');
+        document.getElementById('bookBotWindow').classList.remove('open');
         this.isOpen = false;
     },
     
     ask: function(q) {
-        document.getElementById('BookInput').value = q;
+        document.getElementById('bookInput').value = q;
         this.send();
     },
     
     send: async function() {
-        var input = document.getElementById('BookInput');
+        var input = document.getElementById('bookInput');
         var q = input.value.trim();
         if (!q) return;
         
@@ -226,12 +174,10 @@ const BookBot = {
         var sug = document.getElementById('bookSuggestions');
         if (sug) sug.style.display = 'none';
         
-        // Add user message
-        msgs.innerHTML += '<div class="book-bot-msg user">' + escapeHtml(q) + '</div>';
+        msgs.innerHTML += '<div class="book-bot-msg user">' + q + '</div>';
         
-        // Typing indicator
         var tid = 't' + Date.now();
-        msgs.innerHTML += '<div class="Book-bot-msg bot" id="' + tid + '"><div class="Book-bot-typing"><span></span><span></span><span></span></div></div>';
+        msgs.innerHTML += '<div class="book-bot-msg bot" id="' + tid + '"><div class="book-bot-typing"><span></span><span></span><span></span></div></div>';
         
         input.value = '';
         msgs.scrollTop = msgs.scrollHeight;
@@ -243,51 +189,25 @@ const BookBot = {
                 body: JSON.stringify({question: q})
             });
             var data = await res.json();
-            
-            // Remove typing
             document.getElementById(tid)?.remove();
             
-            // Detect if translating (if question is Hindi/Gujarati)
-            var isTranslated = /[\u0900-\u097F\u0A80-\u0AFF]/.test(q);
-            
-            if (isTranslated) {
-                // Show translating animation
-                var transId = 'trans' + Date.now();
-                msgs.innerHTML += '<div class="translating-indicator" id="' + transId + '"><div class="translating-spinner"></div> Translating to your language...</div>';
-                msgs.scrollTop = msgs.scrollHeight;
-                
-                // Simulate translation delay (remove after 1 second)
-                await new Promise(function(r) { setTimeout(r, 1000); });
-                document.getElementById(transId)?.remove();
-            }
-            
-            // Build sources HTML
             var srcHtml = '';
             if (data.sources && data.sources.length > 0) {
                 srcHtml = '<div class="src">📚 ';
-                data.sources.forEach(function(s) { srcHtml += '📖 ' + s.book + ' (Pg ' + s.page + ') | '; });
+                data.sources.forEach(function(s) { srcHtml += s.book + ' (Pg ' + s.page + ') | '; });
                 srcHtml += '</div>';
             }
             
-            // Add bot message with copy button
-            var msgId = 'msg' + Date.now();
-            msgs.innerHTML += '<div class="Book-bot-msg bot" id="' + msgId + '"><button class="copy-btn" onclick="copyAnswer(this, `' + data.answer.replace(/`/g, '\\`').replace(/\\/g, '\\\\') + '`)" title="Copy answer">📋</button>' + escapeHtml(data.answer) + srcHtml + '</div>';
-            
+            msgs.innerHTML += '<div class="book-bot-msg bot">' + data.answer + srcHtml + '</div>';
         } catch(err) {
             document.getElementById(tid)?.remove();
-            msgs.innerHTML += '<div class="Book-bot-msg bot">❌ Server not reachable.<br><small>Run: uvicorn main:app --host 0.0.0.0 --port 8000</small></div>';
+            msgs.innerHTML += '<div class="book-bot-msg bot">Server not reachable.<br><small>Run: uvicorn main:app --host 0.0.0.0 --port 8000</small></div>';
         }
         
         msgs.scrollTop = msgs.scrollHeight;
         input.focus();
     }
 };
-
-function escapeHtml(text) {
-    var div = document.createElement('div');
-    div.textContent = text;
-    return div.innerHTML;
-}
 </script>
 
 </body>
