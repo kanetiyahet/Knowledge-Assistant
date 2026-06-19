@@ -21,7 +21,7 @@ app.add_middleware(
 
 # ============ CONFIGURATION ============
 MODEL_NAME = "paraphrase-multilingual-MiniLM-L12-v2"
-SARVAM_API_KEY = "sk_siigaz9r_PuPp4mrRoRJKEsurgMod0piE"
+SARVAM_API_KEY = os.environ.get("SARVAM_API_KEY", "your_key_here")
 SARVAM_URL = "https://api.sarvam.ai/translate"
 
 model = SentenceTransformer(MODEL_NAME)
