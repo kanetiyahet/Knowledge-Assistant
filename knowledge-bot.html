@@ -87,7 +87,7 @@
     <div class="book-bot-messages" id="bookMessages">
         <div class="book-bot-msg bot">
             📚 <b>Hello!</b> Ask me anything about your uploaded books.<br>
-            <small>🎤 EN | हि | ગુ to speak</small>
+            <small>🎤 Click mic to speak</small>
         </div>
         <div class="book-bot-suggestions" id="bookSuggestions">
             <button onclick="bookBot.ask('What is this book about?')">📖 What's this about?</button>
@@ -98,9 +98,7 @@
     </div>
     
     <div class="book-bot-input">
-        <button onclick="speak('en-IN')" style="background:#e74c3c;color:white;border:none;border-radius:50%;width:36px;height:36px;min-width:36px;font-size:12px;cursor:pointer;font-weight:bold;">EN</button>
-        <button onclick="speak('hi-IN')" style="background:#e67e22;color:white;border:none;border-radius:50%;width:36px;height:36px;min-width:36px;font-size:12px;cursor:pointer;font-weight:bold;">हि</button>
-        <button onclick="speak('gu-IN')" style="background:#9b59b6;color:white;border:none;border-radius:50%;width:36px;height:36px;min-width:36px;font-size:12px;cursor:pointer;font-weight:bold;">ગુ</button>
+        <button onclick="speak('en-IN')" style="background:#e74c3c;color:white;border:none;border-radius:50%;width:36px;height:36px;min-width:36px;font-size:12px;cursor:pointer;font-weight:bold;">🎤</button>
         <input type="text" id="bookInput" placeholder="Type your question..." onkeydown="if(event.key==='Enter'){event.preventDefault();bookBot.send();}">
         <button onclick="bookBot.send()">➤</button>
     </div>
