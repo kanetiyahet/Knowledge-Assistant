@@ -1,102 +1,93 @@
-import os, json, numpy as np, re
-from fastapi import FastAPI
-from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel
-import chromadb
-from sentence_transformers import SentenceTransformer, CrossEncoder
+import os, fitz, chromadb, json
 import ollama
+from sentence_transformers import SentenceTransformer
 
-app = FastAPI(title="Smart Chunk RAG")
-app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_credentials=True, allow_methods=["*"], allow_headers=["*"])
+BOOKS_FOLDER = "books"
+DB_PATH = "facts_db"
 
-print("Loading...")
-embedding_model = SentenceTransformer("all-MiniLM-L6-v2")
-reranker = CrossEncoder("cross-encoder/ms-marco-MiniLM-L-6-v2")
-chroma_client = chromadb.PersistentClient(path="chroma_db")
-collection = chroma_client.get_collection("book_chunks")
-print(f"✅ {collection.count()} chunks ready!")
+# ===== DON'T DELETE OLD FACTS =====
+chroma_client = chromadb.PersistentClient(path=DB_PATH)
 
-class QueryRequest(BaseModel): question: str
+# Check if collection exists
+try:
+    collection = chroma_client.get_collection("facts")
+    existing_count = collection.count()
+    print(f"📂 Found existing database with {existing_count} facts")
+except:
+    # Create new only if doesn't exist
+    collection = chroma_client.create_collection("facts", metadata={"hnsw:space": "cosine"})
+    existing_count = 0
+    print("📂 Created new database")
 
-def quick_fix(text):
-    fixes = {'ghandhi':'Gandhi','ghandi':'Gandhi','ghndhi':'Gandhi','pleace':'place','wat':'what','wer':'where'}
-    for w, c in fixes.items():
-        if w in text.lower(): text = re.sub(w, c, text, flags=re.IGNORECASE)
-    return text
+model = SentenceTransformer("all-MiniLM-L6-v2")
 
-def add_search_tags(query):
-    """Enhance query with topic tags"""
-    lower = query.lower()
-    tags = []
-    if any(w in lower for w in ['born','birth','birthplace']): tags.append('BIRTH_INFO')
-    if any(w in lower for w in ['die','death','assassinated']): tags.append('DEATH_INFO')
-    if 'satyagraha' in lower: tags.append('SATYAGRAHA')
-    if 'ahimsa' in lower or 'non-violen' in lower: tags.append('AHIMSA')
-    if 'dandi' in lower or 'salt march' in lower: tags.append('DANDI_MARCH')
-    if 'south africa' in lower: tags.append('SOUTH_AFRICA')
-    if tags:
-        return query + " [TAGS: " + " ".join(tags) + "]"
-    return query
+# Get already processed books
+existing_books = set()
+if existing_count > 0:
+    all_meta = collection.get()['metadatas']
+    existing_books = set(m['book'] for m in all_meta)
+    print(f"📚 Already processed: {existing_books}")
 
-@app.post("/ask")
-async def ask(req: QueryRequest):
-    q = quick_fix(req.question.strip())
-    enhanced_q = add_search_tags(q)
-    print(f"\n📝 Q: {q}")
-    print(f"🔍 Enhanced: {enhanced_q}")
-    
-    q_emb = embedding_model.encode([enhanced_q]).tolist()[0]
-    results = collection.query(query_embeddings=[q_emb], n_results=10)
-    
-    chunks = []
-    for i, doc in enumerate(results['documents'][0]):
-        chunks.append({
-            'text': doc,
-            'metadata': results['metadatas'][0][i]
-        })
-    
-    pairs = [[enhanced_q, c['text'][:500]] for c in chunks]
-    scores = reranker.predict(pairs)
-    scored = list(zip(chunks, scores))
-    scored.sort(key=lambda x: x[1], reverse=True)
-    top = [c for c, s in scored[:3]]
-    
-    context = ""
-    sources = []
-    for i, c in enumerate(top):
-        book = c['metadata'].get('book', 'Unknown')
-        chapter = c['metadata'].get('chapter', 'Unknown')
-        text = c['text'][:500]
-        context += f"[Source {i+1}] {book}, {chapter}:\n{text}\n\n"
-        sources.append(f"{book} ({chapter})")
-    
-    print(f"📊 Top: {sources}")
-    
-    prompt = f"""Answer the question using ONLY the sources below.
-Be direct, specific, and factual.
-If the answer is not in the sources, say "Not found in the books."
+pdf_files = [f for f in os.listdir(BOOKS_FOLDER) if f.endswith(".pdf")]
 
-Sources:
-{context}
+new_facts = 0
 
-Question: {q}
-Answer:"""
+for pdf_file in pdf_files:
+    book_name = os.path.splitext(pdf_file)[0]
     
-    try:
-        r = ollama.chat(model="qwen2.5:3b", messages=[{"role":"user","content":prompt}])
-        answer = r["message"]["content"].strip()
-    except:
-        answer = "Error processing."
+    # 🔥 SKIP ALREADY PROCESSED BOOKS
+    if book_name in existing_books:
+        print(f"⏭️ Skipping (already done): {book_name}")
+        continue
     
-    answer += f"\n\n📚 Sources: {' | '.join(sources)}"
+    pdf_path = os.path.join(BOOKS_FOLDER, pdf_file)
+    if not os.path.exists(pdf_path):
+        print(f"⚠️ Missing file: {pdf_file}")
+        continue
     
-    source_objects = [
-        {"book": c['metadata'].get('book','?'), "chapter": c['metadata'].get('chapter','?'), "snippet": c['text'][:150]} 
-        for c in top
-    ]
+    doc = fitz.open(pdf_path)
+    print(f"\n📖 Processing: {book_name} ({len(doc)} pages)")
     
-    return {"answer": answer, "sources": source_objects}
+    for page_num in range(0, len(doc), 5):
+        text = ""
+        for p in range(page_num, min(page_num+5, len(doc))):
+            text += doc[p].get_text("text") + "\n"
+        
+        if len(text.strip()) < 100:
+            continue
+        
+        prompt = f"""Extract ALL key facts from this text. 
+For each fact, write one clear sentence.
+Include: who, what, where, when, why.
+Focus on: birth, death, events, places, people, dates.
 
-@app.get("/")
-async def root(): 
-    return {"status": "Smart Chunk RAG Active", "chunks": collection.count()}
+Text: {text[:2000]}
+
+Facts (one per line):"""
+        
+        try:
+            r = ollama.chat(model="qwen2.5:3b", messages=[{"role":"user","content":prompt}])
+            facts = [f.strip() for f in r["message"]["content"].strip().split('\n') 
+                     if f.strip() and len(f) > 20]
+        except:
+            continue
+        
+        for fact in facts:
+            embedding = model.encode([fact]).tolist()[0]
+            collection.add(
+                embeddings=[embedding],
+                documents=[fact],
+                ids=[f"fact_{book_name}_{page_num}_{hash(fact)%100000}"],
+                metadatas=[{"book": book_name, "page": page_num+1, "fact": fact}]
+            )
+            new_facts += 1
+        
+        print(f"  Pages {page_num+1}-{min(page_num+5, len(doc))}: {len(facts)} facts")
+    
+    doc.close()
+
+print(f"\n{'='*50}")
+print(f"✅ DONE!")
+print(f"   New facts added: {new_facts}")
+print(f"   Total facts: {collection.count()}")
+print(f"{'='*50}")

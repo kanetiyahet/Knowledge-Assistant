@@ -45,6 +45,7 @@ async def ask(req: QueryRequest):
     print(f"\n📝 Q: {q}")
     print(f"🔍 Enhanced: {enhanced_q}")
     
+    # Search chunks
     q_emb = embedding_model.encode([enhanced_q]).tolist()[0]
     results = collection.query(query_embeddings=[q_emb], n_results=10)
     
@@ -55,23 +56,26 @@ async def ask(req: QueryRequest):
             'metadata': results['metadatas'][0][i]
         })
     
+    # Rerank
     pairs = [[enhanced_q, c['text'][:500]] for c in chunks]
     scores = reranker.predict(pairs)
     scored = list(zip(chunks, scores))
     scored.sort(key=lambda x: x[1], reverse=True)
     top = [c for c, s in scored[:3]]
     
+    # Build context
     context = ""
     sources = []
     for i, c in enumerate(top):
         book = c['metadata'].get('book', 'Unknown')
-        chapter = c['metadata'].get('chapter', 'Unknown')
+        page = c['metadata'].get('page', 0)
         text = c['text'][:500]
-        context += f"[Source {i+1}] {book}, {chapter}:\n{text}\n\n"
-        sources.append(f"{book} ({chapter})")
+        context += f"[Source {i+1}] {book}, Page {page}:\n{text}\n\n"
+        sources.append(f"{book} (Page {page})")
     
     print(f"📊 Top: {sources}")
     
+    # Generate answer
     prompt = f"""Answer the question using ONLY the sources below.
 Be direct, specific, and factual.
 If the answer is not in the sources, say "Not found in the books."
@@ -91,7 +95,7 @@ Answer:"""
     answer += f"\n\n📚 Sources: {' | '.join(sources)}"
     
     source_objects = [
-        {"book": c['metadata'].get('book','?'), "chapter": c['metadata'].get('chapter','?'), "snippet": c['text'][:150]} 
+        {"book": c['metadata'].get('book','?'), "page": c['metadata'].get('page',0), "snippet": c['text'][:150]} 
         for c in top
     ]
     
