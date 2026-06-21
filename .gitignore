@@ -11,3 +11,7 @@ frontend/dist/
 Thumbs.db
 .env
 *.env
+chroma_db/
+facts_db/
+*.bin
+*.pickle
